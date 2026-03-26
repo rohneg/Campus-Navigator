@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>College Navigation System</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Smart College Navigation</h1>
+        <p class="subtitle">Shortest path finder for campus locations</p>
+
+        <div class="layout">
+            <div class="card control-card">
+                <label for="source">Select Source</label>
+                <select id="source"></select>
+
+                <label for="destination">Select Destination</label>
+                <select id="destination"></select>
+
+                <button onclick="findRoute()">Find Shortest Path</button>
+
+                <div class="result">
+                    <h2>Route Result</h2>
+                    <p><strong>Path:</strong> <span id="path">-</span></p>
+                    <p><strong>Total Distance:</strong> <span id="distance">-</span></p>
+                </div>
+            </div>
+
+            <div class="card map-card">
+                <div class="map-header">
+                    <h2>Campus Route Map</h2>
+                    <div class="legend">
+                        <span><i class="dot source-dot"></i> Source</span>
+                        <span><i class="dot dest-dot"></i> Destination</span>
+                        <span><i class="dot path-dot"></i> Shortest Path</span>
+                    </div>
+                </div>
+                <canvas id="graphCanvas" width="900" height="600"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
