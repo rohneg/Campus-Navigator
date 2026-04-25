@@ -2,31 +2,36 @@ public class CampusData {
     public static Graph buildGraph() {
         Graph g = new Graph();
 
-        g.addNode("Gate 1");
-        g.addNode("Gate 2");
-        g.addNode("Auditorium");
-        g.addNode("ME Block");
-        g.addNode("CE Block");
-        g.addNode("CSIT");
-        g.addNode("Param Lab");
-        g.addNode("Happiness Canteen");
+        String[] nodes = {
+            "Gate 1","CSIT","SJ","Hill Campus","Audi",
+            "Stadium","Badminton Academy","CE Block",
+            "Basketball Court","Old MBA Block","Param Lab",
+            "XP Block","HG Block","Gate 2"
+        };
 
-        g.addEdge("Gate 1", "CSIT", 60);
-        g.addEdge("Gate 1", "Auditorium", 110);
-        g.addEdge("CSIT", "Auditorium", 50);
+        for (String n : nodes) g.addNode(n);
 
-        g.addEdge("Auditorium", "ME Block", 70);
-        g.addEdge("Auditorium", "Param Lab", 65);
-        g.addEdge("Auditorium", "CE Block", 80);
-        g.addEdge("Auditorium", "Happiness Canteen", 55);
-        
+        g.addEdge("Gate 1","CSIT",60);
+        g.addEdge("Gate 1","SJ",50);
+        g.addEdge("SJ","Hill Campus",70);
 
-        g.addEdge("Param Lab", "CE Block", 35);
-        g.addEdge("CE Block", "Happiness Canteen", 45);
-        g.addEdge("Param Lab", "ME Block", 40);
+        g.addEdge("Gate 1","Audi",80);
+        g.addEdge("CSIT","Audi",60);
 
-        g.addEdge("Gate 2", "Param Lab", 50);
-        g.addEdge("Gate 2", "ME Block", 90);
+        g.addEdge("Audi","Stadium",40);
+        g.addEdge("Stadium","Badminton Academy",30);
+        g.addEdge("Badminton Academy","CE Block",35);
+
+        g.addEdge("CE Block","Basketball Court",20);
+        g.addEdge("Basketball Court","Old MAC Block",25);
+        g.addEdge("Old MCA Block","Param Lab",30);
+        g.addEdge("Param Lab","CE Block",35);
+
+        g.addEdge("Param Lab","KP Block",40);
+        g.addEdge("KP Block","ME Block",30);
+        g.addEdge("ME Block","Audi",50);
+
+        g.addEdge("KP Block","Gate 2",60);
 
         return g;
     }

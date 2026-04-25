@@ -1,6 +1,6 @@
 public class Edge {
-    String to;
-    int weight;
+    public final String to;
+    public final int weight;
 
     public Edge(String to, int weight) {
         this.to = to;

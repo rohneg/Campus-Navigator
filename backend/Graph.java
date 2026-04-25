@@ -8,6 +8,8 @@ public class Graph {
     }
 
     public void addEdge(String a, String b, int w) {
+        addNode(a);
+        addNode(b);
         adj.get(a).add(new Edge(b, w));
         adj.get(b).add(new Edge(a, w));
     }

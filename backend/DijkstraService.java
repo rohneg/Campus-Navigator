@@ -2,33 +2,49 @@ import java.util.*;
 
 public class DijkstraService {
 
+    static class Pair {
+        String node;
+        int dist;
+        Pair(String n, int d) { node = n; dist = d; }
+    }
+
     public RouteResponse findShortestPath(Graph graph, String src, String dest) {
+
+        if (!graph.getNodes().contains(src) || !graph.getNodes().contains(dest)) {
+            return new RouteResponse(Collections.emptyList(), -1);
+        }
+
         Map<String, Integer> dist = new HashMap<>();
         Map<String, String> prev = new HashMap<>();
-        PriorityQueue<String> pq = new PriorityQueue<>(Comparator.comparingInt(dist::get));
 
         for (String node : graph.getNodes()) {
             dist.put(node, Integer.MAX_VALUE);
         }
+
+        PriorityQueue<Pair> pq = new PriorityQueue<>(Comparator.comparingInt(a -> a.dist));
+
         dist.put(src, 0);
-        pq.add(src);
+        pq.add(new Pair(src, 0));
 
         while (!pq.isEmpty()) {
-            String curr = pq.poll();
-            if (curr.equals(dest)) break;
+            Pair curr = pq.poll();
 
-            for (Edge e : graph.getNeighbors(curr)) {
-                int newDist = dist.get(curr) + e.weight;
+            if (curr.node.equals(dest)) break;
+
+            for (Edge e : graph.getNeighbors(curr.node)) {
+                int newDist = dist.get(curr.node) + e.weight;
+
                 if (newDist < dist.get(e.to)) {
                     dist.put(e.to, newDist);
-                    prev.put(e.to, curr);
-                    pq.add(e.to);
+                    prev.put(e.to, curr.node);
+                    pq.add(new Pair(e.to, newDist));
                 }
             }
         }
 
         List<String> path = new ArrayList<>();
         String curr = dest;
+
         while (curr != null) {
             path.add(0, curr);
             curr = prev.get(curr);

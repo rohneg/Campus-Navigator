@@ -17,80 +17,75 @@ public class RouteController {
     public HttpHandler nodesHandler() {
         return exchange -> {
             addCors(exchange);
-            if (exchange.getRequestMethod().equalsIgnoreCase("OPTIONS")) {
-                exchange.sendResponseHeaders(204, -1);
+
+            if (!exchange.getRequestMethod().equalsIgnoreCase("GET")) {
+                exchange.sendResponseHeaders(405, -1);
                 return;
             }
-            StringBuilder sb = new StringBuilder("[");
+
             List<String> nodes = new ArrayList<>(graph.getNodes());
             Collections.sort(nodes);
-            for (int i = 0; i < nodes.size(); i++) {
-                sb.append("\"").append(nodes.get(i)).append("\"");
-                if (i < nodes.size() - 1) sb.append(",");
-            }
-            sb.append("]");
-            sendJson(exchange, 200, sb.toString());
+
+            String json = "[" + String.join(",", nodes.stream()
+                    .map(n -> "\"" + n + "\"").toList()) + "]";
+
+            send(exchange, 200, json);
         };
     }
 
     public HttpHandler routeHandler() {
         return exchange -> {
             addCors(exchange);
-            if (exchange.getRequestMethod().equalsIgnoreCase("OPTIONS")) {
-                exchange.sendResponseHeaders(204, -1);
-                return;
-            }
-            Map<String, String> params = parseQuery(exchange.getRequestURI());
-            String src = params.getOrDefault("src", "");
-            String dest = params.getOrDefault("dest", "");
 
-            if (src.isEmpty() || dest.isEmpty()) {
-                sendJson(exchange, 400, "{\"error\":\"Missing src or dest\"}");
+            if (!exchange.getRequestMethod().equalsIgnoreCase("GET")) {
+                exchange.sendResponseHeaders(405, -1);
                 return;
             }
 
-            RouteResponse result = dijkstra.findShortestPath(graph, src, dest);
+            Map<String,String> q = parse(exchange.getRequestURI());
+            String src = q.get("src");
+            String dest = q.get("dest");
 
-            if (result.distance == -1) {
-                sendJson(exchange, 404, "{\"error\":\"No path found\"}");
+            if (src == null || dest == null) {
+                send(exchange, 400, "{\"error\":\"missing params\"}");
                 return;
             }
 
-            StringBuilder pathArr = new StringBuilder("[");
-            for (int i = 0; i < result.path.size(); i++) {
-                pathArr.append("\"").append(result.path.get(i)).append("\"");
-                if (i < result.path.size() - 1) pathArr.append(",");
-            }
-            pathArr.append("]");
+            RouteResponse res = dijkstra.findShortestPath(graph, src, dest);
 
-            String json = "{\"path\":" + pathArr + ",\"distance\":" + result.distance + "}";
-            sendJson(exchange, 200, json);
+            if (res.distance == -1) {
+                send(exchange, 404, "{\"error\":\"no path\"}");
+                return;
+            }
+
+            String path = "[" + String.join(",", res.path.stream()
+                    .map(n -> "\"" + n + "\"").toList()) + "]";
+
+            send(exchange, 200, "{\"path\":" + path + ",\"distance\":" + res.distance + "}");
         };
     }
 
-    private void addCors(HttpExchange exchange) {
-        exchange.getResponseHeaders().add("Access-Control-Allow-Origin", "*");
-        exchange.getResponseHeaders().add("Access-Control-Allow-Methods", "GET,OPTIONS");
-        exchange.getResponseHeaders().add("Access-Control-Allow-Headers", "Content-Type");
+    private void addCors(HttpExchange ex) {
+        ex.getResponseHeaders().add("Access-Control-Allow-Origin", "*");
     }
 
-    private void sendJson(HttpExchange exchange, int code, String body) throws IOException {
-        byte[] bytes = body.getBytes(StandardCharsets.UTF_8);
-        exchange.getResponseHeaders().add("Content-Type", "application/json");
-        exchange.sendResponseHeaders(code, bytes.length);
-        exchange.getResponseBody().write(bytes);
-        exchange.getResponseBody().close();
+    private void send(HttpExchange ex, int code, String body) throws IOException {
+        byte[] b = body.getBytes(StandardCharsets.UTF_8);
+        ex.sendResponseHeaders(code, b.length);
+        try (OutputStream os = ex.getResponseBody()) {
+            os.write(b);
+        }
     }
 
-    private Map<String, String> parseQuery(URI uri) throws UnsupportedEncodingException {
-        Map<String, String> map = new HashMap<>();
-        String query = uri.getRawQuery();
-        if (query == null) return map;
-        for (String pair : query.split("&")) {
-            String[] kv = pair.split("=", 2);
+    private Map<String,String> parse(URI uri) throws UnsupportedEncodingException {
+        Map<String,String> map = new HashMap<>();
+        String q = uri.getRawQuery();
+        if (q == null) return map;
+
+        for (String p : q.split("&")) {
+            String[] kv = p.split("=");
             if (kv.length == 2) {
-                map.put(java.net.URLDecoder.decode(kv[0], "UTF-8"),
-                        java.net.URLDecoder.decode(kv[1], "UTF-8"));
+                map.put(kv[0], java.net.URLDecoder.decode(kv[1], "UTF-8"));
             }
         }
         return map;
