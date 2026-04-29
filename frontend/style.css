@@ -36,8 +36,10 @@ button {
     color: white;
     border: none;
     cursor: pointer;
+    border-radius: 6px;
 }
 
+/* map-card must be relative so popup is positioned inside it */
 .map-card {
     position: relative;
 }
@@ -45,20 +47,20 @@ button {
 canvas {
     width: 100%;
     border: 1px solid #ccc;
+    display: block;
 }
 
 .popup {
     position: absolute;
-    top: 20px;
-    right: 20px;
-    width: 220px;
+    width: 200px;
     background: #fffaf4;
     border: 1px solid #d8c7b6;
     padding: 12px;
     border-radius: 12px;
-    box-shadow: 0 8px 18px rgba(0,0,0,0.1);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
     font-size: 14px;
     z-index: 10;
+    pointer-events: none;
 }
 
 .hidden {

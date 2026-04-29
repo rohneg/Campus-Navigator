@@ -1,22 +1,20 @@
 import java.util.*;
 
 public class DijkstraService {
-
     static class Pair {
         String node;
         int dist;
-        Pair(String n, int d) { node = n; dist = d; }
+        Pair(String n, int d) {
+             node = n; dist = d; 
+        }
     }
 
     public RouteResponse findShortestPath(Graph graph, String src, String dest) {
-
         if (!graph.getNodes().contains(src) || !graph.getNodes().contains(dest)) {
             return new RouteResponse(Collections.emptyList(), -1);
         }
-
         Map<String, Integer> dist = new HashMap<>();
         Map<String, String> prev = new HashMap<>();
-
         for (String node : graph.getNodes()) {
             dist.put(node, Integer.MAX_VALUE);
         }
@@ -25,7 +23,6 @@ public class DijkstraService {
 
         dist.put(src, 0);
         pq.add(new Pair(src, 0));
-
         while (!pq.isEmpty()) {
             Pair curr = pq.poll();
 
@@ -33,7 +30,6 @@ public class DijkstraService {
 
             for (Edge e : graph.getNeighbors(curr.node)) {
                 int newDist = dist.get(curr.node) + e.weight;
-
                 if (newDist < dist.get(e.to)) {
                     dist.put(e.to, newDist);
                     prev.put(e.to, curr.node);
@@ -41,7 +37,6 @@ public class DijkstraService {
                 }
             }
         }
-
         List<String> path = new ArrayList<>();
         String curr = dest;
 
